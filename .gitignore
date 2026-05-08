@@ -41,3 +41,6 @@ ENV/
 *.swp
 *.swo
 .DS_Store
+
+# Claude Code local settings (per-machine)
+.claude/settings.local.json

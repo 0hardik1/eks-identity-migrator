@@ -48,6 +48,19 @@ uv run eks-identity-migrator --help
 
 Run `make verify` before every commit. CI mirrors it.
 
+## SessionStart hook
+
+`.claude/settings.json` registers a SessionStart hook that runs
+`uv sync --frozen` and `make verify` on every Claude session start. The hook
+prints either:
+- `[session_start] verify OK — N passed, COVER%` — baseline is green, you can
+  start working immediately.
+- `[session_start] verify FAILED — last 30 lines below; full log at
+  /tmp/eim-verify.log` — fix the gate before adding code.
+
+This makes the project self-explaining for incoming agents: a single line tells
+you whether the codebase is in a known-good state.
+
 ## Where to add things
 
 - **A new finding code** → add to `risk/codes.py` (`FindingCode` StrEnum), add a `Rule` to `risk/rules.py`, add a fixture pair under `testdata/trust-policies/<NN>_<name>.{in,expected}.json`.
@@ -75,3 +88,4 @@ Run `make verify` before every commit. CI mirrors it.
 - Pod Identity Associations are same-account only. Cross-account roles are flagged red and skipped.
 - LocalStack EKS Pod Identity API coverage is incomplete; integration tests use a fake EKS at the Protocol boundary while keeping IAM real on LocalStack.
 - Acceptance §12.1 (≥50 SAs in <30s) can only be measured against a real EKS cluster.
+- mypy is pinned `<2.0` because mypy 2.0.0 has a regression on `disable_error_code` in `tool.mypy.overrides`.

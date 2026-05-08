@@ -89,7 +89,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "S105", "S106", "S108", "B017", "F841", "E501"]
-"test/**/*.py" = ["S101", "S105", "S106", "S108"]
+"test/**/*.py" = ["S101", "S105", "S106", "S108", "E501", "UP017", "I001"]
 "src/eks_identity_migrator/risk/codes.py" = ["S105"]  # token-file env var name flagged as 'password'
 
 [tool.ruff.lint.isort]
