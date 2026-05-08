@@ -1,0 +1,33 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ClusterA",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/CLUSTERA"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-west-2.amazonaws.com/id/CLUSTERA:aud": "sts.amazonaws.com",
+          "oidc.eks.us-west-2.amazonaws.com/id/CLUSTERA:sub": "system:serviceaccount:production:app-frontend"
+        }
+      }
+    },
+    {
+      "Sid": "ClusterB",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/CLUSTERB"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-east-1.amazonaws.com/id/CLUSTERB:aud": "sts.amazonaws.com",
+          "oidc.eks.us-east-1.amazonaws.com/id/CLUSTERB:sub": "system:serviceaccount:production:app-frontend"
+        }
+      }
+    }
+  ]
+}

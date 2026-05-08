@@ -1,0 +1,134 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eks-identity-migrator"
+version = "0.1.0"
+description = "Audit a cluster's IRSA usage, generate a safe migration plan to EKS Pod Identity, and apply it incrementally with verification and rollback."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "eks-identity-migrator contributors" }]
+keywords = ["eks", "iam", "irsa", "pod-identity", "kubernetes", "aws"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+]
+dependencies = [
+    "boto3>=1.35",
+    "botocore>=1.35",
+    "kubernetes>=31.0",
+    "pydantic>=2.9",
+    "ruamel.yaml>=0.18",
+    "rich>=13.7",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "boto3-stubs[iam,eks,sts]>=1.35",
+    "botocore-stubs>=1.35",
+    "coverage[toml]>=7.6",
+    "moto[iam,eks,sts]>=5.0",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "types-pyyaml>=6.0",
+]
+
+[project.scripts]
+eks-identity-migrator = "eks_identity_migrator.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/0hardik1/eks-identity-migrator"
+Repository = "https://github.com/0hardik1/eks-identity-migrator"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eks_identity_migrator"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/testdata", "/README.md", "/CLAUDE.md", "/docs/SPEC.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",      # pycodestyle + pyflakes
+    "I",                 # isort
+    "UP",                # pyupgrade
+    "N",                 # pep8-naming
+    "B",                 # bugbear
+    "S",                 # bandit
+    "A",                 # builtins shadow
+    "C4",                # comprehensions
+    "SIM",               # simplify
+    "TID",               # tidy imports
+    "RUF",               # ruff-specific
+]
+ignore = [
+    "S101",              # asserts allowed in tests
+    "S603", "S607",      # subprocess usage in integration harness is intentional
+    "B008",              # typer uses defaults via Option(...) which trips B008
+    "N818",              # exception suffix not enforced
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S105", "S106"]
+"test/**/*.py" = ["S101", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["eks_identity_migrator"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+plugins = ["pydantic.mypy"]
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["kubernetes.*", "ruamel.*", "moto.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+addopts = "-q --cov=src/eks_identity_migrator --cov-report=term-missing --cov-report=xml -m 'not integration'"
+testpaths = ["tests"]
+markers = [
+    "integration: requires docker/kind/localstack (run with --integration)",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src/eks_identity_migrator"]
+omit = ["src/eks_identity_migrator/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "\\.\\.\\.",
+]
+show_missing = true
+skip_covered = false
