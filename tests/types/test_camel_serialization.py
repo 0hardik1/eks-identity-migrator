@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -68,7 +68,7 @@ def test_finding_serialization() -> None:
 def test_inventory_round_trip() -> None:
     inv = Inventory(
         cluster=CLUSTER,
-        generated_at=datetime(2026, 5, 8, 14, 32, tzinfo=timezone.utc),
+        generated_at=datetime(2026, 5, 8, 14, 32, tzinfo=UTC),
         mappings=[],
     )
     data = inv.model_dump_json(by_alias=True)
@@ -104,7 +104,7 @@ def test_plan_round_trip() -> None:
     plan = Plan(
         cluster=CLUSTER,
         strategy="append",
-        generated_at=datetime(2026, 5, 8, 14, 32, tzinfo=timezone.utc),
+        generated_at=datetime(2026, 5, 8, 14, 32, tzinfo=UTC),
         steps=[],
     )
     blob = plan.model_dump_json(by_alias=True)
@@ -114,7 +114,7 @@ def test_plan_round_trip() -> None:
 
 def test_journal_entry_camel_aliases() -> None:
     entry = JournalEntry(
-        ts=datetime(2026, 5, 8, 14, 35, 1, tzinfo=timezone.utc),
+        ts=datetime(2026, 5, 8, 14, 35, 1, tzinfo=UTC),
         op=JournalOp.IAM_UPDATE_ASSUME_ROLE_POLICY,
         status=JournalStatus.SUCCESS,
         sa=SARef(namespace="prod", name="frontend"),

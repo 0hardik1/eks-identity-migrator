@@ -1,0 +1,3 @@
+{
+  "note": "No .in.json — the ROLE_NOT_FOUND case is driven by the IAM client returning NoSuchEntity. Audit emits a synthetic gray finding without consulting the classifier."
+}

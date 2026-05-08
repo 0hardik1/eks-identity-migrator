@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 import typer
 
 from eks_identity_migrator.cli.exit_codes import ExitCode
 
 
-class Phase(str, Enum):
+class Phase(StrEnum):
     TRUST = "trust"
     ASSOCIATION = "association"
     CLEANUP = "cleanup"

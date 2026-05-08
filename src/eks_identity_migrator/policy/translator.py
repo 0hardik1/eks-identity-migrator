@@ -20,7 +20,7 @@ from __future__ import annotations
 import copy
 from typing import Any, Literal
 
-from eks_identity_migrator.policy.canonicalizer import canonicalize, canonical_json
+from eks_identity_migrator.policy.canonicalizer import canonical_json, canonicalize
 from eks_identity_migrator.policy.parser import parse_trust_policy
 
 Strategy = Literal["append", "replace"]
@@ -70,7 +70,7 @@ def _is_pod_identity_statement(stmt: dict[str, Any]) -> bool:
 
 
 def _is_oidc_irsa_statement(stmt: dict[str, Any]) -> bool:
-    """True if this statement is the IRSA pattern (Federated principal + AssumeRoleWithWebIdentity)."""
+    """True if this statement is the IRSA pattern (Federated + AssumeRoleWithWebIdentity)."""
     principal = stmt.get("Principal", {})
     if not isinstance(principal, dict) or "Federated" not in principal:
         return False

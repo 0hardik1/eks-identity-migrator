@@ -30,6 +30,6 @@ def migrate_cmd(
 
 
 def register(app: typer.Typer) -> None:
-    app.command(
-        name="migrate", help="Convenience: green-only end-to-end with verify gates."
-    )(migrate_cmd)
+    app.command(name="migrate", help="Convenience: green-only end-to-end with verify gates.")(
+        migrate_cmd
+    )

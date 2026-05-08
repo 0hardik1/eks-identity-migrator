@@ -60,9 +60,31 @@ def test_inequivalent_when_principals_differ() -> None:
 def test_canonicalize_does_not_mutate_input() -> None:
     snapshot = dict(A)
     canonicalize(A)
-    assert A == snapshot
+    assert snapshot == A
 
 
 def test_canonical_json_indent_default_two() -> None:
     out = canonical_json({"a": 1})
     assert out.count("  ") >= 1  # 2-space indent present
+
+
+def test_canonicalize_handles_mixed_type_list() -> None:
+    """Lists with mixed types fall back to a JSON-string sort key."""
+    payload = {"x": [1, "a", {"k": 2}, [1, 2]]}
+    out = canonicalize(payload)
+    # Round-trip is structurally identical (same elements).
+    assert sorted(out["x"], key=str) == sorted(payload["x"], key=str)
+
+
+def test_canonicalize_nested_lists() -> None:
+    """Nested lists are recursively canonicalized."""
+    a = {"x": [{"b": 2, "a": 1}, {"a": 1, "b": 2}]}
+    b = {"x": [{"a": 1, "b": 2}, {"b": 2, "a": 1}]}
+    assert policies_equivalent(a, b)
+
+
+def test_canonicalize_scalar_values_unchanged() -> None:
+    assert canonicalize({"x": 5}) == {"x": 5}
+    assert canonicalize({"x": "s"}) == {"x": "s"}
+    assert canonicalize({"x": True}) == {"x": True}
+    assert canonicalize({"x": None}) == {"x": None}

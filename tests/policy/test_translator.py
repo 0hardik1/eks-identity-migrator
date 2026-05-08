@@ -31,11 +31,11 @@ def test_built_statement_includes_mandatory_conditions() -> None:
     stmt = build_pod_identity_statement(
         cluster_arn=CLUSTER_ARN, account=ACCOUNT, sa_name="frontend"
     )
-    assert stmt["Principal"]["Service"] == POD_IDENTITY_SERVICE  # type: ignore[index]
+    assert stmt["Principal"]["Service"] == POD_IDENTITY_SERVICE
     assert "sts:AssumeRole" in stmt["Action"]
     assert "sts:TagSession" in stmt["Action"]
-    assert stmt["Condition"]["StringEquals"]["aws:SourceAccount"] == ACCOUNT  # type: ignore[index]
-    assert stmt["Condition"]["ArnEquals"]["aws:SourceArn"] == CLUSTER_ARN  # type: ignore[index]
+    assert stmt["Condition"]["StringEquals"]["aws:SourceAccount"] == ACCOUNT
+    assert stmt["Condition"]["ArnEquals"]["aws:SourceArn"] == CLUSTER_ARN
 
 
 def test_built_statement_generates_sid_from_sa_name() -> None:
@@ -108,7 +108,8 @@ def test_append_preserves_ec2_principal() -> None:
     services = [
         s["Principal"]["Service"]
         for s in out["Statement"]
-        if isinstance(s, dict) and isinstance(s.get("Principal"), dict)
+        if isinstance(s, dict)
+        and isinstance(s.get("Principal"), dict)
         and "Service" in s["Principal"]
     ]
     assert "ec2.amazonaws.com" in services
@@ -189,7 +190,5 @@ def test_translate_invalid_policy_raises() -> None:
 
 def test_translate_adds_version_when_missing() -> None:
     inp: dict[str, object] = {"Statement": []}
-    out = translate(
-        inp, strategy="append", cluster_arn=CLUSTER_ARN, account=ACCOUNT, sa_name="x"
-    )
+    out = translate(inp, strategy="append", cluster_arn=CLUSTER_ARN, account=ACCOUNT, sa_name="x")
     assert out["Version"] == "2012-10-17"

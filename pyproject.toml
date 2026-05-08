@@ -39,7 +39,7 @@ dev = [
     "botocore-stubs>=1.35",
     "coverage[toml]>=7.6",
     "moto[iam,eks,sts]>=5.0",
-    "mypy>=1.11",
+    "mypy>=1.11,<2.0",
     "pytest>=8.3",
     "pytest-cov>=5.0",
     "ruff>=0.6",
@@ -83,11 +83,14 @@ ignore = [
     "S603", "S607",      # subprocess usage in integration harness is intentional
     "B008",              # typer uses defaults via Option(...) which trips B008
     "N818",              # exception suffix not enforced
+    "A005",              # `types` is a fine submodule name in our package
+    "S112",              # try/except/continue is intentional in defensive classifier
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "S105", "S106"]
-"test/**/*.py" = ["S101", "S105", "S106"]
+"tests/**/*.py" = ["S101", "S105", "S106", "S108", "B017", "F841", "E501"]
+"test/**/*.py" = ["S101", "S105", "S106", "S108"]
+"src/eks_identity_migrator/risk/codes.py" = ["S105"]  # token-file env var name flagged as 'password'
 
 [tool.ruff.lint.isort]
 known-first-party = ["eks_identity_migrator"]
@@ -101,9 +104,13 @@ plugins = ["pydantic.mypy"]
 files = ["src", "tests"]
 
 [[tool.mypy.overrides]]
-module = ["kubernetes.*", "ruamel.*", "moto.*"]
+module = ["kubernetes.*", "ruamel.*", "moto.*", "rich.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["no-any-return", "untyped-decorator"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
