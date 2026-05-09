@@ -13,6 +13,10 @@ EKS supports two ways for pods to obtain AWS credentials:
 
 Migrating an existing cluster is mechanical for ~70% of cases but contains landmines (multi-cluster role reuse, cross-account assumption, custom OIDC claim conditions, etc.). This tool inventories your IRSA usage, classifies each mapping for safety, generates a reviewable plan, applies it in three phases (trust → association → cleanup), verifies, and rolls back when needed.
 
+## Learn more
+
+For an in-depth conceptual walk-through (how OIDC + IRSA work, how Pod Identity works, and why Pod Identity is the recommended path), see [`docs/learn/`](docs/learn/README.md). The engineering specification lives in [`docs/SPEC.md`](docs/SPEC.md).
+
 ## Install
 
 Requires Python 3.11+.
