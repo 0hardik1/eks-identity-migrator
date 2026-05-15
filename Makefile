@@ -1,4 +1,4 @@
-.PHONY: help install ci-bootstrap fmt fmt-check lint typecheck test coverage-gate verify integration bootstrap-integration clean
+.PHONY: help install ci-bootstrap fmt fmt-check lint typecheck test coverage-gate verify integration bootstrap-integration clean scan
 
 PY := uv run
 COVERAGE_OVERALL_MIN := 60
@@ -6,6 +6,7 @@ COVERAGE_CORE_MIN := 80
 COVERAGE_CORE_INCLUDE := src/eks_identity_migrator/policy/*,src/eks_identity_migrator/risk/*,src/eks_identity_migrator/plan/*
 
 help:
+	@echo "make scan               - zero-arg audit using current kubectl context + AWS profile"
 	@echo "make install            - install dev dependencies via uv sync"
 	@echo "make ci-bootstrap       - install with frozen lockfile (CI)"
 	@echo "make verify             - fmt-check + lint + typecheck + test + coverage gates"
@@ -18,6 +19,13 @@ help:
 	@echo "make integration        - run integration tests (requires kind+localstack)"
 	@echo "make bootstrap-integration - install kind, kubectl, pull localstack image"
 	@echo "make clean              - remove caches and build artifacts"
+
+# Quickstart: zero-arg audit. Uses the active kubectl context for the cluster
+# name + region (auto-detected from EKS-ARN or eksctl context-name shapes)
+# and your default AWS credential chain (AWS_PROFILE / ~/.aws/config).
+# To override: `uv run eks-identity-migrator audit --cluster X --region Y --profile Z`.
+scan:
+	$(PY) eks-identity-migrator audit
 
 install:
 	uv sync --all-extras --dev

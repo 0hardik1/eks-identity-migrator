@@ -1,17 +1,17 @@
-"""Wire `audit` CLI command to discovery + renderer."""
+"""Wire `audit` CLI command to discovery + renderer.
+
+Reads from EKS + IAM + STS + K8s, builds an :class:`Inventory`, prints a
+table, and optionally writes JSON to ``--out``. Returns an :class:`ExitCode`;
+the CLI layer maps that to the process exit status.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 from eks_identity_migrator.audit.discovery import discover
-from eks_identity_migrator.aws.eks import BotoEksClient
-from eks_identity_migrator.aws.iam import BotoIamClient
-from eks_identity_migrator.aws.session import make_session
-from eks_identity_migrator.aws.sts import BotoStsClient
 from eks_identity_migrator.cli.exit_codes import ExitCode
-from eks_identity_migrator.k8s.client import KubernetesClient
-from eks_identity_migrator.k8s.config import load_kube_config
+from eks_identity_migrator.cli.setup import make_clients
 
 
 def run(
@@ -31,19 +31,14 @@ def run(
     from eks_identity_migrator.output.json_render import inventory_to_json
     from eks_identity_migrator.output.table import render_inventory_table
 
-    session = make_session(region=region, profile=profile)
-    eks = BotoEksClient(session)
-    iam = BotoIamClient(session)
-    sts = BotoStsClient(session)
-    load_kube_config()
-    k8s = KubernetesClient()
+    clients = make_clients(region=region, profile=profile)
 
     try:
         inventory = discover(
-            eks=eks,
-            iam=iam,
-            sts=sts,
-            k8s=k8s,
+            eks=clients.eks,
+            iam=clients.iam,
+            sts=clients.sts,
+            k8s=clients.k8s,
             cluster_name=cluster,
             namespace=namespace,
             service_account=service_account,
