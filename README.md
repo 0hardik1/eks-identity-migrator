@@ -31,12 +31,35 @@ pipx install eks-identity-migrator
 
 ## Quickstart
 
+### First run
+
 ```bash
-# 1. Read-only audit of a cluster
+make scan
+```
+
+`make scan` is the zero-arg quickstart: it runs a **read-only** audit against
+the cluster pointed to by your current `kubectl` context, using your default
+AWS credentials. The tool auto-detects the cluster name and region from the
+context (it recognises both EKS-ARN-style context names and `eksctl`-generated
+ones) and prints what it picked so you can abort if it's not the cluster you
+meant. The output is annotated with short explanations — you'll learn what
+IRSA is, what Pod Identity is, and how each risk colour translates to a
+migration action.
+
+To override the auto-detection or use a non-default profile:
+
+```bash
+eks-identity-migrator audit --cluster my-cluster --region us-west-2 --profile prod
+```
+
+### Full migration flow
+
+```bash
+# 1. Read-only audit (or `make scan` for the zero-arg form)
 eks-identity-migrator audit --cluster my-cluster --region us-west-2
 
 # 2. Generate a migration plan (green-only by default)
-eks-identity-migrator plan --cluster my-cluster --strategy append --out plan.yaml
+eks-identity-migrator plan --strategy append --out plan.yaml
 
 # Review plan.yaml; comment out rows you aren't ready for.
 
@@ -55,8 +78,11 @@ eks-identity-migrator apply --plan plan.yaml --phase cleanup
 For a one-shot green-only migration with verification gates between phases:
 
 ```bash
-eks-identity-migrator migrate --cluster my-cluster
+eks-identity-migrator migrate
 ```
+
+Add `--quiet` to any command to suppress the educational intro/outro panels
+once you no longer need them.
 
 ## Commands
 

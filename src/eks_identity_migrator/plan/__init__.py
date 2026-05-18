@@ -1,4 +1,14 @@
-"""Plan generation entry point."""
+"""Turn an Inventory into a reviewable Plan (and read it back from YAML).
+
+The :func:`generate` step filters the inventory by risk + strategy and
+synthesises the actions ``apply`` will perform per ServiceAccount (trust
+policy diff, association spec, annotation patch). The output is round-trip
+stable YAML — humans can comment rows out before applying.
+
+By default only ``GREEN``-classified mappings produce concrete plan steps;
+``YELLOW`` rows appear as ``skip=true`` unless ``--include-yellow`` is set.
+``RED`` and ``GRAY`` are always skipped — they need human judgement.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,15 @@
-"""Apply phase dispatch."""
+"""Apply one migration phase to AWS / K8s state.
+
+The package is split into a generic :mod:`runner` (handles journaling,
+dry-run, continue-on-error) plus three thin handlers — :mod:`trust`,
+:mod:`association`, :mod:`cleanup` — one per phase. Every side effect is
+wrapped by ``runner._record`` so :mod:`rollback` can replay the journal in
+reverse later.
+
+Run order is mandatory: trust must succeed before association, and verify
+should be clean before cleanup. The CLI enforces this only by convention —
+each phase is its own subcommand invocation.
+"""
 
 from __future__ import annotations
 

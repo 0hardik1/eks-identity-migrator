@@ -24,11 +24,13 @@ def test_version_flag() -> None:
     assert "0.1.0" in result.output
 
 
-def test_audit_help_documents_required_cluster_flag() -> None:
+def test_audit_help_documents_cluster_flag() -> None:
     result = runner.invoke(app, ["audit", "--help"])
     assert result.exit_code == 0
     assert "--cluster" in result.output
     assert "--out" in result.output
+    # `--cluster` is now optional; help should explain the auto-detect fallback.
+    assert "auto-detect" in result.output
 
 
 def test_plan_help_lists_strategy_and_include_yellow() -> None:
