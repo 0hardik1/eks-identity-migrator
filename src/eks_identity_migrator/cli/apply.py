@@ -1,12 +1,19 @@
-"""`apply --phase ...` subcommand."""
+"""`apply --phase ...` subcommand.
+
+Wire-up: cli/apply.py → cli/runners.py::run_apply → apply/__init__.py::run.
+Phase is a typer Enum so an invalid value gets rejected by typer itself
+(exit code 2) before any AWS call is made.
+"""
 
 from __future__ import annotations
 
 from enum import StrEnum
 
 import typer
+from rich.console import Console
 
 from eks_identity_migrator.cli.exit_codes import ExitCode
+from eks_identity_migrator.output import educational
 
 
 class Phase(StrEnum):
@@ -29,6 +36,8 @@ def apply_cmd(
 ) -> None:
     """Execute one migration phase."""
     from eks_identity_migrator.cli.runners import run_apply
+
+    Console(stderr=True).print(educational.apply_phase_intro(phase=phase.value))
 
     code = run_apply(
         plan=plan,
